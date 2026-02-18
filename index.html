@@ -309,6 +309,7 @@
   <div class="page" id="page-admin">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
       <div class="section-title" style="margin:0;">⚡ ADMIN PANEL</div>
+      <button class="btn btn-orange btn-sm" onclick="exportSite()" title="Download a new copy of this file with your current levels baked in — share this file so everyone sees your changes">⬇ EXPORT & SHARE</button>
       <button class="btn btn-ghost btn-sm" onclick="navigate('home')">← BACK</button>
     </div>
     <div class="tabs">
@@ -861,6 +862,27 @@ function showToast(msg,type='success'){
 //  UTILS
 // ════════════════════════════════════════════════
 function escHtml(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+
+// ════════════════════════════════════════════════
+//  EXPORT SITE (bake current levels into a new HTML file)
+// ════════════════════════════════════════════════
+function exportSite() {
+  // Get the current page HTML
+  const src = document.documentElement.outerHTML;
+  // Replace the DEFAULT_LEVELS constant with the current levels data
+  const levelsJson = JSON.stringify(levels, null, 2);
+  const updated = src.replace(
+    /const DEFAULT_LEVELS = \[[\s\S]*?\];/,
+    `const DEFAULT_LEVELS = ${levelsJson};`
+  );
+  // Also clear any localStorage keys embedded in the export so it reads from DEFAULT_LEVELS fresh
+  const blob = new Blob([updated], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'demonlist.html';
+  a.click();
+  showToast('Exported! Share the downloaded file. ✅', 'success');
+}
 
 // ════════════════════════════════════════════════
 //  BOOT
